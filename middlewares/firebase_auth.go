@@ -1,11 +1,11 @@
 package middlewares
 
 import (
-	"checkinfix.com/constants"
 	"checkinfix.com/setup"
 	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 )
 
 type AuthenticateUser struct {
@@ -23,7 +23,8 @@ func FirebaseAuth() gin.HandlerFunc {
 			return
 		}
 
-		if loginUserRequest.AccessToken == constants.CommonSecrete {
+		secrete, exists := os.LookupEnv("API_SECRETE")
+		if exists && loginUserRequest.AccessToken == secrete {
 			return
 		}
 
