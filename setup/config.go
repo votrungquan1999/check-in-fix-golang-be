@@ -4,6 +4,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"strings"
 )
 
 type Config struct {
@@ -46,11 +47,14 @@ func LoadConfig() {
 		println("no .env file found")
 	}
 
+	firebasePrivateKey := mustString("FIREBASE_PRIVATE_KEY")
+	firebasePrivateKey = strings.ReplaceAll(firebasePrivateKey, "\\n", "\n")
+
 	EnvConfig = Config{
 		FirebaseType:                mustString("FIREBASE_TYPE"),
 		FirebaseProjectID:           mustString("FIREBASE_PROJECT_ID"),
 		FirebasePrivateKeyID:        mustString("FIREBASE_PRIVATE_KEY_ID"),
-		FirebasePrivateKey:          mustString("FIREBASE_PRIVATE_KEY"),
+		FirebasePrivateKey:          firebasePrivateKey,
 		FirebaseClientEmail:         mustString("FIREBASE_CLIENT_EMAIL"),
 		FirebaseClientID:            mustString("FIREBASE_CLIENT_ID"),
 		FirebaseAuthURI:             mustString("FIREBASE_AUTH_URI"),
