@@ -24,16 +24,18 @@ func CreateCustomer(subscriberID string, payload requests.CreateCustomerRequest)
 		return nil, utils.ErrorBadRequest.New("Customer with the same phone number and name already exists")
 	}
 
-	//if doesCustomerExisted(subscriberID, payload) {
-	//	return nil, utils.ErrorBadRequest.New("Customer with the same phone number and name already exists")
-	//}
-
 	newCustomer := models.Customers{
 		PhoneNumber:  payload.PhoneNumber,
 		FirstName:    payload.FirstName,
 		LastName:     payload.LastName,
 		Email:        payload.Email,
 		SubscriberID: &subscriberID,
+		AddressLine1: payload.AddressLine1,
+		AddressLine2: payload.AddressLine2,
+		City:         payload.City,
+		State:        payload.State,
+		ZipCode:      payload.ZipCode,
+		Country:      payload.Country,
 	}
 
 	ref := firestoreClient.Collection(constants.FirestoreCustomerDoc).NewDoc()

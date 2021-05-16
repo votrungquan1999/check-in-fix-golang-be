@@ -14,16 +14,30 @@ func CreateTickets(payload requests.CreateTicketRequest) (*models.Tickets, error
 	firestoreClient := setup.FirestoreClient
 	ctx := context.Background()
 
+	customerRef := firestoreClient.Collection(constants.FirestoreCustomerDoc).Doc(*payload.CustomerID)
+	customerSnapshot, err := customerRef.Get(ctx)
+	if err != nil {
+		return nil, utils.ErrorInternal.New(err.Error())
+	}
+
+	var customer models.Customers
+	if err := customerSnapshot.DataTo(&customer); err != nil {
+		return nil, utils.ErrorInternal.New(err.Error())
+	}
+
 	newTicket := models.Tickets{
-		CustomerID:  payload.CustomerID,
-		ServiceID:   payload.ServiceID,
-		Description: payload.Description,
-		PhoneType:   payload.PhoneType,
+		CustomerID:            payload.CustomerID,
+		ServiceID:             payload.ServiceID,
+		SMSNotificationEnable: payload.SMSNotificationEnable,
+		Description:           payload.Description,
+		PhoneType:             payload.PhoneType,
+		ContactPhoneNumber:    payload.ContactPhoneNumber,
+		SubscriberID:          customer.SubscriberID,
 	}
 
 	ticketRef := firestoreClient.Collection(constants.FirestoreTicketDoc).NewDoc()
 
-	_, err := ticketRef.Set(ctx, newTicket)
+	_, err = ticketRef.Set(ctx, newTicket)
 	if err != nil {
 		fmt.Println(err)
 
@@ -39,6 +53,8 @@ func CreateTickets(payload requests.CreateTicketRequest) (*models.Tickets, error
 	if err := createdTicketSnapshot.DataTo(&createdTicket); err != nil {
 		return nil, utils.ErrorInternal.New(err.Error())
 	}
+
+	createdTicket.ID = &ticketRef.ID
 
 	return &createdTicket, nil
 }
