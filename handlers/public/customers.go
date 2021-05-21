@@ -22,7 +22,7 @@ func GetCustomers(c *gin.Context) {
 
 	for {
 		var user models.Customers
-		err := utils.GetNextDoc(iter, &user)
+		_, err := utils.GetNextDoc(iter, &user)
 		if err == iterator.Done {
 			break
 		}

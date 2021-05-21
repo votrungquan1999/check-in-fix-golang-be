@@ -25,7 +25,10 @@ func CreateTickets(payload requests.CreateTicketRequest) (*models.Tickets, error
 		return nil, utils.ErrorInternal.New(err.Error())
 	}
 
+	var approvedBy = ""
+
 	newTicket := models.Tickets{
+		ApprovedBy:            &approvedBy,
 		CustomerID:            payload.CustomerID,
 		ServiceID:             payload.ServiceID,
 		SMSNotificationEnable: payload.SMSNotificationEnable,

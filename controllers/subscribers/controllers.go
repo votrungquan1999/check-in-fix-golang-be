@@ -12,6 +12,7 @@ func RoutesGroup(rg *gin.RouterGroup) {
 	router := rg.Group("/subscribers")
 	{
 		router.POST("/", createSubscriber)
+		router.GET("/:subscriber_id", getSubscriber)
 	}
 }
 
@@ -28,6 +29,20 @@ func createSubscriber(c *gin.Context) {
 	if err != nil {
 		_ = c.Error(err)
 		//c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": subscriber,
+	})
+}
+
+func getSubscriber(c *gin.Context) {
+	subscriberID := c.Param("subscriber_id")
+
+	subscriber, err := subscriberHandler.GetSubscriber(subscriberID)
+	if err != nil {
+		_ = c.Error(err)
 		return
 	}
 
