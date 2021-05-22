@@ -9,7 +9,7 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func GetCustomers(phoneNumber string, subscriberID string) ([]models.Customers, error) {
+func GetCustomersByPhoneNumber(phoneNumber string, subscriberID string) ([]models.Customers, error) {
 	firestoreClient := setup.FirestoreClient
 
 	ctx := context.Background()
@@ -21,8 +21,8 @@ func GetCustomers(phoneNumber string, subscriberID string) ([]models.Customers, 
 	customers := make([]models.Customers, 0)
 
 	for {
-		var user models.Customers
-		id, err := utils.GetNextDoc(iter, &user)
+		var customer models.Customers
+		id, err := utils.GetNextDoc(iter, &customer)
 		if err == iterator.Done {
 			break
 		}
@@ -30,9 +30,38 @@ func GetCustomers(phoneNumber string, subscriberID string) ([]models.Customers, 
 			return nil, utils.ErrorInternal.New(err.Error())
 		}
 
-		user.ID = &id
+		customer.ID = &id
 
-		customers = append(customers, user)
+		customers = append(customers, customer)
+	}
+
+	return customers, nil
+}
+
+func GetCustomers(subscriberID string) ([]models.Customers, error) {
+	firestoreClient := setup.FirestoreClient
+	ctx := context.Background()
+
+	iter := firestoreClient.Collection(constants.FirestoreCustomerDoc).
+		Where("subscriber_id", "==", subscriberID).
+		Documents(ctx)
+
+	customers := make([]models.Customers, 0)
+
+	for {
+		var customer models.Customers
+
+		id, err := utils.GetNextDoc(iter, &customer)
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, utils.ErrorInternal.New(err.Error())
+		}
+
+		customer.ID = &id
+
+		customers = append(customers, customer)
 	}
 
 	return customers, nil

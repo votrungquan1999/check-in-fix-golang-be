@@ -24,5 +24,7 @@ func GetSubscriber(subscriberID string) (*models.Subscribers, error) {
 		return nil, utils.ErrorInternal.New(err.Error())
 	}
 
+	subscriber.ID = &subscriberID
+
 	return &subscriber, nil
 }

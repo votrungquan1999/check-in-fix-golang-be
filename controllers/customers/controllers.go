@@ -16,8 +16,9 @@ func RoutesGroup(rg *gin.RouterGroup) {
 
 	customerRouter := rg.Group("/subscribers/:subscriber_id/customers")
 	{
-		customerRouter.GET("/:phone_number", getCustomers)
+		customerRouter.GET("/:phone_number", getCustomersByPhoneNumber)
 		customerRouter.POST("/", createCustomer)
+		customerRouter.GET("/", getCustomers)
 	}
 }
 
@@ -41,11 +42,25 @@ func createCustomer(c *gin.Context) {
 	})
 }
 
-func getCustomers(c *gin.Context) {
+func getCustomersByPhoneNumber(c *gin.Context) {
 	subscriberID := c.Param("subscriber_id")
 	phoneNumber := c.Param("phone_number")
 
-	customers, err := customerHandler.GetCustomers(phoneNumber, subscriberID)
+	customers, err := customerHandler.GetCustomersByPhoneNumber(phoneNumber, subscriberID)
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": customers,
+	})
+}
+
+func getCustomers(c *gin.Context) {
+	subscriberID := c.Param("subscriber_id")
+
+	customers, err := customerHandler.GetCustomers(subscriberID)
 	if err != nil {
 		_ = c.Error(err)
 		return
