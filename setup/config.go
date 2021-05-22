@@ -18,6 +18,8 @@ type Config struct {
 	FirebaseTokenURI            string `mapstructure:"FIREBASE_TOKEN_URI"`
 	FirebaseAuthProviderCertURL string `mapstructure:"FIREBASE_AUTH_PROVIDER_CERT_URL"`
 	FirebaseClientCertURL       string `mapstructure:"FIREBASE_CLIENT_CERT_URL"`
+	NexmoApiKey                 string
+	NexmoApiSecret              string
 }
 
 var EnvConfig Config
@@ -61,6 +63,8 @@ func LoadConfig() {
 		FirebaseTokenURI:            mustString("FIREBASE_TOKEN_URI"),
 		FirebaseAuthProviderCertURL: mustString("FIREBASE_AUTH_PROVIDER_X509_CERT_URL"),
 		FirebaseClientCertURL:       mustString("FIREBASE_CLIENT_X509_CERT_URL"),
+		NexmoApiKey:                 stringDefault("NEXMO_API_KEY", ""),
+		NexmoApiSecret:              stringDefault("NEXMO_API_SECRETE", ""),
 	}
 }
 

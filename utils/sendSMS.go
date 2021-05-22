@@ -1,0 +1,74 @@
+package utils
+
+import (
+	"bytes"
+	"checkinfix.com/setup"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+)
+
+type sendSMSBody struct {
+	From      string `json:"from"`
+	Text      string `json:"text"`
+	To        string `json:"to"`
+	ApiKey    string `json:"api_key"`
+	ApiSecret string `json:"api_secret"`
+	Type      string `json:"type"`
+}
+
+
+func SendSMS(from string, to string, text string) (interface{}, error) {
+	var url = "https://rest.nexmo.com/sms/json"
+	body := sendSMSBody{
+		From:      from,
+		Text:      text,
+		To:        to,
+		ApiKey:    setup.EnvConfig.NexmoApiKey,
+		ApiSecret: setup.EnvConfig.NexmoApiSecret,
+		Type:      "unicode",
+	}
+
+	payloadBuf := new(bytes.Buffer)
+
+	err := json.NewEncoder(payloadBuf).Encode(body)
+
+	fmt.Println(payloadBuf.String())
+	if err != nil {
+		return nil, ErrorInternal.New(err.Error())
+	}
+	//
+	//res, err := http.Post(url, "application/x-www-form-urlencoded", payloadBuf)
+	res, err := http.Post(url, "application/json", payloadBuf)
+	if err != nil {
+		return nil, ErrorInternal.New(err.Error())
+	}
+
+
+	//client := &http.Client{}
+	//r, err := http.NewRequest("POST", url, payloadBuf) // URL-encoded payload
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//r.Header.Add("Content-Type", "application/json")
+	//r.Header.Add("Content-Length", strconv.Itoa(payloadBuf.Len()))
+
+	//res, err := client.Do(r)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+
+	defer func() {
+		_ = res.Body.Close()
+	}()
+
+	respBody, err := ioutil.ReadAll(res.Body)
+
+	//abc := bytes.Fields(respBody)
+
+	//var respBody []byte
+
+	//_, _ = res.Body.Read(respBody)
+	return string(respBody), nil
+}

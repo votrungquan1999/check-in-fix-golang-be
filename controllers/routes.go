@@ -4,6 +4,7 @@ import (
 	"checkinfix.com/controllers/customers"
 	"checkinfix.com/controllers/employees"
 	"checkinfix.com/controllers/public"
+	"checkinfix.com/controllers/sms_sending"
 	"checkinfix.com/controllers/subscribers"
 	"checkinfix.com/controllers/tickets"
 	"checkinfix.com/controllers/utils"
@@ -31,5 +32,6 @@ func SetupRoutes(r *gin.Engine) {
 		employees.RoutesGroup(privateRoutesGroup)
 		utils.RoutesGroup(privateRoutesGroup)
 		tickets.RoutesGroup(privateRoutesGroup)
+		sms_sending.RoutesGroup(privateRoutesGroup)
 	}
 }
