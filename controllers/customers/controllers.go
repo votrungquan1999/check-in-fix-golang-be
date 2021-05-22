@@ -15,7 +15,7 @@ func RoutesGroup(rg *gin.RouterGroup) {
 	//	ticketRouter.POST("/", public.CreateTicket)
 	//}
 
-	customerRouter := rg.Group("/subscribers/:subscriber_id/customers")
+	customerRouter := rg.Group("/subscribers/:subscriber_id/customer")
 	{
 		//customerRouter.GET("/:phone_number", getCustomersByPhoneNumber)
 		customerRouter.POST("", createCustomer)
