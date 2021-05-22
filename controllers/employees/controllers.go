@@ -11,7 +11,7 @@ import (
 func RoutesGroup(rg *gin.RouterGroup) {
 	router := rg.Group("/subscribers/:subscriber_id/employees")
 	{
-		router.POST("/", createEmployee)
+		router.POST("", createEmployee)
 		router.GET("/:employee_id", getEmployee)
 	}
 }

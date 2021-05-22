@@ -2,6 +2,7 @@ package customers
 
 import (
 	customerHandler "checkinfix.com/handlers/customers"
+	"checkinfix.com/models"
 	"checkinfix.com/requests"
 	"checkinfix.com/utils"
 	"github.com/gin-gonic/gin"
@@ -16,9 +17,9 @@ func RoutesGroup(rg *gin.RouterGroup) {
 
 	customerRouter := rg.Group("/subscribers/:subscriber_id/customers")
 	{
-		customerRouter.GET("/:phone_number", getCustomersByPhoneNumber)
-		customerRouter.POST("/", createCustomer)
-		customerRouter.GET("/", getCustomers)
+		//customerRouter.GET("/:phone_number", getCustomersByPhoneNumber)
+		customerRouter.POST("", createCustomer)
+		customerRouter.GET("", getCustomers)
 	}
 }
 
@@ -42,28 +43,25 @@ func createCustomer(c *gin.Context) {
 	})
 }
 
-func getCustomersByPhoneNumber(c *gin.Context) {
-	subscriberID := c.Param("subscriber_id")
-	phoneNumber := c.Param("phone_number")
-
-	customers, err := customerHandler.GetCustomersByPhoneNumber(phoneNumber, subscriberID)
-	if err != nil {
-		_ = c.Error(err)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"data": customers,
-	})
-}
-
 func getCustomers(c *gin.Context) {
 	subscriberID := c.Param("subscriber_id")
+	phoneNumber := c.Query("phone_number")
 
-	customers, err := customerHandler.GetCustomers(subscriberID)
-	if err != nil {
-		_ = c.Error(err)
-		return
+	var customers []models.Customers
+	var err error
+
+	if phoneNumber == "" {
+		customers, err = customerHandler.GetCustomers(subscriberID)
+		if err != nil {
+			_ = c.Error(err)
+			return
+		}
+	} else {
+		customers, err = customerHandler.GetCustomersByPhoneNumber(phoneNumber, subscriberID)
+		if err != nil {
+			_ = c.Error(err)
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
