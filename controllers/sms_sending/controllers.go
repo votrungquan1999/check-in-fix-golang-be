@@ -13,6 +13,7 @@ func RoutesGroup(rg *gin.RouterGroup) {
 	router := rg.Group("/sms_sending")
 	{
 		router.POST("/test", sendSMSTest)
+		router.POST("/test-twilio", sendSMSTestWithTwilio)
 		router.POST("", sendSMS)
 	}
 }
@@ -24,7 +25,23 @@ func sendSMSTest(c *gin.Context) {
 		return
 	}
 
-	resp, err := utils.SendSMS("\nVonageAPIs", "84813792279", *sendingMessageRequest.Message)
+	resp, err := utils.SendSMSWithNexmo("VonageAPIs", "84947503840", *sendingMessageRequest.Message)
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	fmt.Println(resp)
+}
+
+func sendSMSTestWithTwilio(c *gin.Context) {
+	var sendingMessageRequest requests.SMSSendingRequest
+	if err := c.ShouldBindJSON(&sendingMessageRequest); err != nil {
+		_ = c.Error(utils.ErrorBadRequest.New(err.Error()))
+		return
+	}
+
+	resp, err := utils.SendSMSWithTwilio("VonageAPIs", "+84813792279", *sendingMessageRequest.Message)
 	if err != nil {
 		_ = c.Error(err)
 		return

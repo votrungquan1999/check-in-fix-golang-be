@@ -13,10 +13,7 @@ func SendSMSToCustomers(payload requests.SMSSendingRequest) error {
 	firestoreClient := setup.FirestoreClient
 	ctx := context.Background()
 
-	subscriber, err := utils.GetSubscriberByID(*payload.SubscriberID)
-	if err != nil {
-		return err
-	}
+	var subscriberID *string
 
 	customers := make([]models.Customers, 0)
 	for _, id := range payload.CustomerIds {
@@ -35,11 +32,19 @@ func SendSMSToCustomers(payload requests.SMSSendingRequest) error {
 
 		customer.ID = &id
 
+		if subscriberID == nil {
+			subscriberID = customer.SubscriberID
+		} else {
+			if subscriberID != customer.SubscriberID {
+				return utils.ErrorBadRequest.New("all customers are not from the same subscriber")
+			}
+		}
+
 		customers = append(customers, customer)
 	}
 
 	for _, customer := range customers {
-		_, err := utils.SendSMS(*subscriber.Name, *customer.PhoneNumber, *payload.Message)
+		_, err := utils.SendSMSWithTwilio("", *customer.PhoneNumber, *payload.Message)
 		if err != nil {
 			return err
 		}
