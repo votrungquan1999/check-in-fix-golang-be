@@ -1,7 +1,7 @@
 package models
 
 type Employees struct {
-	ID           *string  `json:"id,omitempty"`
+	ID           *string  `firestore:"id,omitempty" json:"id,omitempty"`
 	UserID       *string  `firestore:"user_id,omitempty" json:"user_id" binding:"omitempty"`
 	Email        *string  `firestore:"email,omitempty" json:"email" binding:"omitempty"`
 	FirstName    *string  `firestore:"first_name,omitempty" json:"first_name" binding:"omitempty"`

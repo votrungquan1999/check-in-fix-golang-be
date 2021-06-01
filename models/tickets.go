@@ -7,7 +7,7 @@ type Tickets struct {
 	ServiceID             *string `firestore:"service_id,omitempty" json:"service_id"`
 	Description           *string `firestore:"description,omitempty" json:"description"`
 	ApprovedBy            *string `firestore:"approved_by,omitempty" json:"approved_by"`
-	PhoneType             *string `firestore:"phone_type,omitempty" json:"phone_type"`
+	DeviceModel           *string `firestore:"device_model,omitempty" json:"device_model"`
 	ContactPhoneNumber    *string `firestore:"contact_phone_number,omitempty" json:"contact_phone_number"`
 	SMSNotificationEnable *bool   `firestore:"sms_notification_enable,omitempty" json:"sms_notification_enable"`
 

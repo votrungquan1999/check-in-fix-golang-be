@@ -31,7 +31,6 @@ func SendSMSToCustomers(payload requests.SMSSendingRequest) error {
 		}
 
 		customer.ID = &id
-
 		if subscriberID == nil {
 			subscriberID = customer.SubscriberID
 		} else {

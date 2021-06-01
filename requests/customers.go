@@ -12,5 +12,6 @@ type (
 		State        *string `json:"state"`
 		ZipCode      *string `json:"zip_code"`
 		Country      *string `json:"country"`
+		SubscriberID *string `json:"subscriber_id"`
 	}
 )

@@ -10,14 +10,16 @@ import (
 )
 
 func CreateSubscribers(payload *requests.CreateSubscriberRequest) (*models.Subscribers, error) {
+	ctx := context.Background()
+	firestoreClient := setup.FirestoreClient
+
+	ref := firestoreClient.Collection(constants.FirestoreSubscriberDoc).NewDoc()
+
 	newSubscriber := models.Subscribers{
 		Name:  payload.Name,
 		Email: payload.Email,
+		ID:    &ref.ID,
 	}
-
-	ctx := context.Background()
-	firestoreClient := setup.FirestoreClient
-	ref := firestoreClient.Collection(constants.FirestoreSubscriberDoc).NewDoc()
 
 	_, err := ref.Set(ctx, newSubscriber)
 	if err != nil {

@@ -24,6 +24,8 @@ func CreateEmployee(subscriberID string, payload requests.CreateEmployeeRequest)
 			return utils.ErrorBadRequest.New(err.Error())
 		}
 
+		ref := firestoreClient.Collection(constants.FirestoreEmployeeDoc).NewDoc()
+
 		newEmployee := models.Employees{
 			UserID:       &user.UID,
 			Email:        payload.Email,
@@ -31,9 +33,9 @@ func CreateEmployee(subscriberID string, payload requests.CreateEmployeeRequest)
 			LastName:     payload.LastName,
 			SubscriberID: &subscriberID,
 			Scopes:       payload.Scopes,
+			ID:           &ref.ID,
 		}
 
-		ref := firestoreClient.Collection(constants.FirestoreEmployeeDoc).NewDoc()
 		err = transaction.Set(ref, newEmployee)
 		if err != nil {
 			return utils.ErrorBadRequest.New(err.Error())

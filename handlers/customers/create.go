@@ -11,11 +11,13 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func CreateCustomer(subscriberID string, payload requests.CreateCustomerRequest) (*models.Customers, error) {
+func CreateCustomer(
+//subscriberID string,
+	payload requests.CreateCustomerRequest) (*models.Customers, error) {
 	firestoreClient := setup.FirestoreClient
 	ctx := context.Background()
 
-	customerExisted, err := doesCustomerExisted(subscriberID, payload)
+	customerExisted, err := doesCustomerExisted(payload)
 	if err != nil {
 		return nil, err
 	}
@@ -24,21 +26,22 @@ func CreateCustomer(subscriberID string, payload requests.CreateCustomerRequest)
 		return nil, utils.ErrorBadRequest.New("Customer with the same phone number and name already exists")
 	}
 
+	ref := firestoreClient.Collection(constants.FirestoreCustomerDoc).NewDoc()
+
 	newCustomer := models.Customers{
 		PhoneNumber:  payload.PhoneNumber,
 		FirstName:    payload.FirstName,
 		LastName:     payload.LastName,
 		Email:        payload.Email,
-		SubscriberID: &subscriberID,
+		SubscriberID: payload.SubscriberID,
 		AddressLine1: payload.AddressLine1,
 		AddressLine2: payload.AddressLine2,
 		City:         payload.City,
 		State:        payload.State,
 		ZipCode:      payload.ZipCode,
 		Country:      payload.Country,
+		ID:           &ref.ID,
 	}
-
-	ref := firestoreClient.Collection(constants.FirestoreCustomerDoc).NewDoc()
 
 	_, err = ref.Set(ctx, newCustomer)
 	if err != nil {
@@ -66,8 +69,8 @@ func CreateCustomer(subscriberID string, payload requests.CreateCustomerRequest)
 	return &createdCustomer, nil
 }
 
-func doesCustomerExisted(subscriberID string, createCustomerPayload requests.CreateCustomerRequest) (bool, error) {
-	fmt.Println(subscriberID)
+func doesCustomerExisted(createCustomerPayload requests.CreateCustomerRequest) (bool, error) {
+	//fmt.Println(subscriberID)
 	firestoreClient := setup.FirestoreClient
 	ctx := context.Background()
 	iter := firestoreClient.
@@ -75,7 +78,7 @@ func doesCustomerExisted(subscriberID string, createCustomerPayload requests.Cre
 		Where("phone_number", "==", createCustomerPayload.PhoneNumber).
 		Where("first_name", "==", createCustomerPayload.FirstName).
 		Where("last_name", "==", createCustomerPayload.LastName).
-		Where("subscriber_id", "==", subscriberID).
+		Where("subscriber_id", "==", createCustomerPayload.SubscriberID).
 		Documents(ctx)
 
 	_, err := iter.Next()

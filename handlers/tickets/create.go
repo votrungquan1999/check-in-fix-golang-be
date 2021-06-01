@@ -27,24 +27,25 @@ func CreateTickets(payload requests.CreateTicketRequest) (*models.Tickets, error
 
 	var approvedBy = ""
 
+	ticketRef := firestoreClient.Collection(constants.FirestoreTicketDoc).NewDoc()
+
 	newTicket := models.Tickets{
 		ApprovedBy:            &approvedBy,
 		CustomerID:            payload.CustomerID,
 		ServiceID:             payload.ServiceID,
 		SMSNotificationEnable: payload.SMSNotificationEnable,
 		Description:           payload.Description,
-		PhoneType:             payload.PhoneType,
+		DeviceModel:           payload.DeviceModel,
 		ContactPhoneNumber:    payload.ContactPhoneNumber,
 		SubscriberID:          customer.SubscriberID,
+		ID:                    &ticketRef.ID,
 	}
-
-	ticketRef := firestoreClient.Collection(constants.FirestoreTicketDoc).NewDoc()
 
 	_, err = ticketRef.Set(ctx, newTicket)
 	if err != nil {
 		fmt.Println(err)
 
-		return nil, utils.ErrorInternal.New("")
+		return nil, utils.ErrorInternal.New(err.Error())
 	}
 
 	createdTicketSnapshot, err := ticketRef.Get(ctx)
