@@ -6,9 +6,98 @@ import (
 	"checkinfix.com/setup"
 	"checkinfix.com/utils"
 	"context"
+	"github.com/gin-gonic/gin"
 	"google.golang.org/api/iterator"
+	"reflect"
+	"strings"
 	"time"
 )
+
+func GetCustomersWithSubscriberID(c *gin.Context, subscriberID string) ([]models.Customers, error) {
+	var customers []models.Customers
+	var err error
+
+	phoneNumber := c.Query("phone_number")
+	if phoneNumber != "" {
+		customers, err = GetCustomersByPhoneNumber(phoneNumber, subscriberID)
+		if err != nil {
+			return nil, err
+		}
+		return customers, nil
+	}
+
+	filter := c.Query("filter")
+	if filter != "" {
+		customers, err = GetCustomersByFilter(strings.ToLower(filter), subscriberID)
+		if err != nil {
+			return nil, err
+		}
+		return customers, nil
+	}
+
+	customers, err = GetCustomersBySubscriberID(subscriberID)
+	if err != nil {
+		return nil, err
+	}
+	return customers, nil
+}
+
+func GetCustomersByFilter(filter string, subscriberID string) ([]models.Customers, error) {
+	firestoreClient := setup.FirestoreClient
+
+	ctx := context.Background()
+	iter := firestoreClient.Collection(constants.FirestoreCustomerDoc).
+		Where("subscriber_id", "==", subscriberID).
+		Documents(ctx)
+
+	customers := make([]models.Customers, 0)
+
+	for {
+		var customer models.Customers
+		id, err := utils.GetNextDoc(iter, &customer)
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, utils.ErrorInternal.New(err.Error())
+		}
+
+		if !CustomerContains(customer, filter) {
+			continue
+		}
+
+		customer.ID = &id
+		customers = append(customers, customer)
+	}
+
+	return customers, nil
+}
+
+func CustomerContains(customer models.Customers, key string) bool {
+	v := reflect.ValueOf(customer)
+
+	values := make([]string, 0)
+
+	for i := 0; i < v.NumField(); i++ {
+		value, ok := (v.Field(i).Interface()).(*string)
+
+		if !ok {
+			continue
+		}
+
+		if value != nil {
+			values = append(values, strings.ToLower(*value))
+		}
+	}
+
+	for _, value := range values {
+		if strings.Contains(value, key) {
+			return true
+		}
+	}
+
+	return false
+}
 
 func GetCustomersByPhoneNumber(phoneNumber string, subscriberID string) ([]models.Customers, error) {
 	firestoreClient := setup.FirestoreClient
@@ -39,7 +128,7 @@ func GetCustomersByPhoneNumber(phoneNumber string, subscriberID string) ([]model
 	return customers, nil
 }
 
-func GetCustomers(subscriberID string) ([]models.Customers, error) {
+func GetCustomersBySubscriberID(subscriberID string) ([]models.Customers, error) {
 	firestoreClient := setup.FirestoreClient
 	ctx := context.Background()
 
