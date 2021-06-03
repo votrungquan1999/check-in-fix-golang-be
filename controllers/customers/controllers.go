@@ -57,7 +57,6 @@ func getCustomersHandler(c *gin.Context) {
 
 func getCustomers(c *gin.Context) []models.Customers {
 	subscriberID := c.Query("subscriber_id")
-	phoneNumber := c.Query("phone_number")
 
 	query := c.Request.URL.Query()
 	customerIDs := query["customer_id"]
@@ -65,8 +64,8 @@ func getCustomers(c *gin.Context) []models.Customers {
 	var customers []models.Customers
 	var err error
 
-	if phoneNumber != "" {
-		customers, err = customerHandler.GetCustomersByPhoneNumber(phoneNumber, subscriberID)
+	if subscriberID != "" {
+		customers, err = customerHandler.GetCustomersWithSubscriberID(c, subscriberID)
 		if err != nil {
 			_ = c.Error(err)
 			return nil
@@ -83,11 +82,7 @@ func getCustomers(c *gin.Context) []models.Customers {
 		return customers
 	}
 
-	customers, err = customerHandler.GetCustomers(subscriberID)
-	if err != nil {
-		_ = c.Error(err)
-		return nil
-	}
+	_ = c.Error(utils.ErrorBadRequest.New("filter is not supported"))
 
-	return customers
+	return nil
 }
