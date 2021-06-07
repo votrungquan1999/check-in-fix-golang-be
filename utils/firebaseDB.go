@@ -10,9 +10,8 @@ import (
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"reflect"
 )
-
-
 
 func GetNextDoc(iter *firestore.DocumentIterator, returnObj interface{}) (string, error) {
 	doc, err := iter.Next()
@@ -55,4 +54,50 @@ func GetSubscriberByID(id string) (*models.Subscribers, error) {
 	}
 
 	return &subscriber, err
+}
+
+func PatchStructData(ref *firestore.DocumentRef, oldData interface{}, newData interface{}) error {
+	newDataType := reflect.TypeOf(newData)
+	newDataValue := reflect.ValueOf(newData)
+	oldDataValue := reflect.ValueOf(oldData).Elem()
+
+	if oldDataValue.Kind() != reflect.Struct || newDataValue.Kind() != reflect.Struct ||
+		newDataType.Kind() != reflect.Struct {
+		fmt.Println(oldDataValue.Kind(), newDataValue.Kind(), newDataType.Kind(), "data type")
+		return ErrorInternal.New("patch data only accept struct")
+	}
+
+	for i := 0; i < newDataType.NumField(); i++ {
+		newField := newDataType.Field(i)
+		newFieldName := newField.Name
+		newFieldValue := newDataValue.FieldByName(newFieldName)
+
+		if newFieldValue.IsZero() {
+			continue
+		}
+
+		oldFieldValue := oldDataValue.FieldByName(newFieldName)
+		if !oldFieldValue.IsValid() {
+			continue
+		}
+
+		if oldFieldValue.Kind() != newFieldValue.Kind() {
+			fmt.Println("old field and new field value is not the same kind", oldFieldValue.Kind(),
+				newFieldValue.Kind())
+			continue
+		}
+
+		if !oldFieldValue.CanSet() {
+			continue
+		}
+		oldFieldValue.Set(newFieldValue)
+	}
+
+	_, err := ref.Set(context.Background(), oldData)
+
+	if err != nil {
+		return ErrorInternal.New(err.Error())
+	}
+
+	return nil
 }

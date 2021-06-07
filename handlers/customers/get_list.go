@@ -6,6 +6,7 @@ import (
 	"checkinfix.com/setup"
 	"checkinfix.com/utils"
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/api/iterator"
 	"reflect"
@@ -158,7 +159,6 @@ func GetCustomersBySubscriberID(subscriberID string) ([]models.Customers, error)
 }
 
 func GetCustomerByIDs(customerIDs []string) ([]models.Customers, error) {
-
 	customers := make([]models.Customers, 0)
 	customerChannel := make(chan []models.Customers)
 	errorChannel := make(chan error)
@@ -209,11 +209,12 @@ func GetCustomerByIDs(customerIDs []string) ([]models.Customers, error) {
 }
 
 func GetCustomerByIDsChunk(customerIDs []string) ([]models.Customers, error) {
+	fmt.Println(customerIDs)
 	firestoreClient := setup.FirestoreClient
 	ctx := context.Background()
 
 	iter := firestoreClient.Collection(constants.FirestoreCustomerDoc).
-		Where("ID", "in", customerIDs).
+		Where("id", "in", customerIDs).
 		Documents(ctx)
 
 	customers := make([]models.Customers, 0)
@@ -233,6 +234,8 @@ func GetCustomerByIDsChunk(customerIDs []string) ([]models.Customers, error) {
 
 		customers = append(customers, customer)
 	}
+
+	fmt.Println(customers)
 
 	return customers, nil
 }

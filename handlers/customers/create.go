@@ -11,9 +11,7 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func CreateCustomer(
-//subscriberID string,
-	payload requests.CreateCustomerRequest) (*models.Customers, error) {
+func CreateCustomer(payload requests.CreateCustomerRequest) (*models.Customers, error) {
 	firestoreClient := setup.FirestoreClient
 	ctx := context.Background()
 

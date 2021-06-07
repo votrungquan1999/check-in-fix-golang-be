@@ -10,23 +10,15 @@ import (
 )
 
 func RoutesGroup(rg *gin.RouterGroup) {
-	//ticketRouter := rg.Group("/tickets")
-	//{
-	//	ticketRouter.POST("/", public.CreateTicket)
-	//}
-
 	customerRouter := rg.Group("/customers")
 	{
-		//customerRouter.GET("/:phone_number", getCustomersByPhoneNumber)
 		customerRouter.POST("", createCustomer)
 		customerRouter.GET("", getCustomersHandler)
+		customerRouter.PATCH("/:customer_id", updateCustomer)
 	}
 }
 
 func createCustomer(c *gin.Context) {
-	//subscriberID := c.Param("subscriber_id")
-	//subscriberID := c.Query("phone_number")
-
 	var createCustomerPayload requests.CreateCustomerRequest
 	if err := c.ShouldBindJSON(&createCustomerPayload); err != nil {
 		_ = c.Error(utils.ErrorBadRequest.New(err.Error()))
@@ -85,4 +77,26 @@ func getCustomers(c *gin.Context) []models.Customers {
 	_ = c.Error(utils.ErrorBadRequest.New("filter is not supported"))
 
 	return nil
+}
+
+func updateCustomer(c *gin.Context) {
+	customerID := c.Param("customer_id")
+	var updateCustomerPayload requests.UpdateCustomerRequest
+
+	if err := c.ShouldBindJSON(&updateCustomerPayload); err != nil {
+		_ = c.Error(utils.ErrorBadRequest.New(err.Error()))
+		return
+	}
+
+	//fmt.Println(updateCustomerPayload.PhoneNumber, customerID, updateCustomerPayload.PhoneNumber == nil)
+
+	updatedCustomer, err := customerHandler.UpdateCustomer(customerID, updateCustomerPayload)
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": updatedCustomer,
+	})
 }
