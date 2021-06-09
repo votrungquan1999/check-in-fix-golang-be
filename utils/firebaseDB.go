@@ -34,6 +34,20 @@ func GetNextDoc(iter *firestore.DocumentIterator, returnObj interface{}) (string
 	return doc.Ref.ID, nil
 }
 
+func GetDataByRef(ref *firestore.DocumentRef, returnObj interface{}) error {
+	ctx := context.Background()
+	snapShot, err := ref.Get(ctx)
+	if err != nil {
+		return ErrorEntityNotFound.New("id is not found")
+	}
+
+	if err = snapShot.DataTo(returnObj); err != nil {
+		return ErrorInternal.New(err.Error())
+	}
+
+	return nil
+}
+
 func GetSubscriberByID(id string) (*models.Subscribers, error) {
 	firestoreClient := setup.FirestoreClient
 	ctx := context.Background()
@@ -56,7 +70,22 @@ func GetSubscriberByID(id string) (*models.Subscribers, error) {
 	return &subscriber, err
 }
 
-func PatchStructData(ref *firestore.DocumentRef, oldData interface{}, newData interface{}) error {
+func PatchStructDataAndUpdate(ref *firestore.DocumentRef, oldData interface{}, newData interface{}) error {
+	err := PatchStructData(oldData, newData)
+	if err != nil {
+		return err
+	}
+
+	_, err = ref.Set(context.Background(), oldData)
+
+	if err != nil {
+		return ErrorInternal.New(err.Error())
+	}
+
+	return nil
+}
+
+func PatchStructData(oldData interface{}, newData interface{}) error {
 	newDataType := reflect.TypeOf(newData)
 	newDataValue := reflect.ValueOf(newData)
 	oldDataValue := reflect.ValueOf(oldData).Elem()
@@ -91,12 +120,6 @@ func PatchStructData(ref *firestore.DocumentRef, oldData interface{}, newData in
 			continue
 		}
 		oldFieldValue.Set(newFieldValue)
-	}
-
-	_, err := ref.Set(context.Background(), oldData)
-
-	if err != nil {
-		return ErrorInternal.New(err.Error())
 	}
 
 	return nil

@@ -7,8 +7,6 @@ import (
 	"checkinfix.com/setup"
 	"checkinfix.com/utils"
 	"context"
-	"fmt"
-	"reflect"
 )
 
 func UpdateCustomer(customerID string, payload requests.UpdateCustomerRequest) (*models.Customers, error) {
@@ -28,27 +26,10 @@ func UpdateCustomer(customerID string, payload requests.UpdateCustomerRequest) (
 		return nil, utils.ErrorInternal.New(err.Error())
 	}
 
-	err = utils.PatchStructData(customerRef, &customer, payload)
+	err = utils.PatchStructDataAndUpdate(customerRef, &customer, payload)
 	if err != nil {
 		return nil, err
 	}
 
-	//_, err = customerRef.Set(ctx, payload)
-	//if err != nil {
-	//	return nil, utils.ErrorInternal.New(err.Error())
-	//}
-
-	//getExpectedCustomer(customer, payload)
-
 	return &customer, nil
-}
-
-func getExpectedCustomer(customer models.Customers, updatePayload requests.UpdateCustomerRequest) (models.Customers,
-	error) {
-	t := reflect.ValueOf(updatePayload)
-
-	fmt.Println(*t.FieldByName("PhoneNumber").Interface().(*string))
-	//fmt.Println(t.FieldByName("PhoneNumber").())
-
-	return customer, nil
 }
