@@ -8,6 +8,7 @@ import (
 	"checkinfix.com/utils"
 	"context"
 	"fmt"
+	"time"
 )
 
 func FeedbackReview(ID string, payload requests.FeedbackReviewRequest) (*models.Reviews, error) {
@@ -28,9 +29,14 @@ func FeedbackReview(ID string, payload requests.FeedbackReviewRequest) (*models.
 		return nil, utils.ErrorBadRequest.New("review rate must be as most 4.0 to be rated")
 	}
 
+	if review.Feedback != nil {
+		return nil, utils.ErrorBadRequest.New("review already has feedback")
+	}
+
 	newReviewData := models.Reviews{
 		Feedback:   payload.Feedback,
 		IsReviewed: true,
+		UpdatedAt:  time.Now(),
 	}
 
 	err := utils.PatchStructData(&review, newReviewData)

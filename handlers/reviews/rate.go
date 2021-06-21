@@ -7,6 +7,7 @@ import (
 	"checkinfix.com/setup"
 	"checkinfix.com/utils"
 	"context"
+	"time"
 )
 
 func RateReview(ID string, ratingPayload requests.RateReviewRequest) (*models.Reviews, error) {
@@ -23,7 +24,11 @@ func RateReview(ID string, ratingPayload requests.RateReviewRequest) (*models.Re
 		return nil, utils.ErrorBadRequest.New("review is already rated")
 	}
 
-	err := utils.PatchStructData(&review, ratingPayload)
+	newReviewData := models.Reviews{
+		Rating:    ratingPayload.Rating,
+		UpdatedAt: time.Now(),
+	}
+	err := utils.PatchStructData(&review, newReviewData)
 	if err != nil {
 		return nil, err
 	}

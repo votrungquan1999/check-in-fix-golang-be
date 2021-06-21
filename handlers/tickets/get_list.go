@@ -7,7 +7,6 @@ import (
 	"checkinfix.com/utils"
 	"context"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/api/iterator"
 )
 
 func GetListTicketsBySubscriberID(subscriberID string, c *gin.Context) ([]models.Tickets, error) {
@@ -27,15 +26,15 @@ func GetDraftTickets(subscriberID string) ([]models.Tickets, error) {
 	draftTickets := make([]models.Tickets, 0)
 	for {
 		var ticket models.Tickets
-		ID, err := utils.GetNextDoc(ticketIter, &ticket)
-		if err == iterator.Done {
+		id, err := utils.GetNextDoc(ticketIter, &ticket)
+		if id == "" {
 			break
 		}
 		if err != nil {
 			return nil, utils.ErrorInternal.New(err.Error())
 		}
 
-		ticket.ID = &ID
+		ticket.ID = &id
 
 		draftTickets = append(draftTickets, ticket)
 	}
@@ -54,15 +53,15 @@ func GetTicketsByCustomerID(customerID string) ([]models.Tickets, error) {
 	tickets := make([]models.Tickets, 0)
 	for {
 		var ticket models.Tickets
-		ID, err := utils.GetNextDoc(ticketIter, &ticket)
-		if err == iterator.Done {
+		id, err := utils.GetNextDoc(ticketIter, &ticket)
+		if id == "" {
 			break
 		}
 		if err != nil {
 			return nil, utils.ErrorInternal.New(err.Error())
 		}
 
-		ticket.ID = &ID
+		ticket.ID = &id
 
 		tickets = append(tickets, ticket)
 	}

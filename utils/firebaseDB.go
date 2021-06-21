@@ -11,24 +11,25 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"reflect"
+	"time"
 )
 
-func GetNextDoc(iter *firestore.DocumentIterator, returnObj interface{}) (string, error) {
+func GetNextDoc(iter *firestore.DocumentIterator, returnObj interface{}) (id string, err error) {
 	doc, err := iter.Next()
 
 	if err == iterator.Done {
-		return "", err
+		return "", nil
 	}
 
 	if err != nil {
-		fmt.Println(err)
-		return "", err
+		//fmt.Println(err)
+		return "", ErrorInternal.New(err.Error())
 	}
 
 	err = doc.DataTo(returnObj)
 	if err != nil {
-		fmt.Println(err)
-		return "", err
+		//fmt.Println(err)
+		return "", ErrorInternal.New(err.Error())
 	}
 
 	return doc.Ref.ID, nil
@@ -123,4 +124,71 @@ func PatchStructData(oldData interface{}, newData interface{}) error {
 	}
 
 	return nil
+}
+
+// sample must be struct with the snapshot
+func GetReviewFromSnapshotsAsync(snapshots []*firestore.DocumentSnapshot) ([]models.Reviews, error) {
+	dataChan := make(chan []models.Reviews)
+	errChan := make(chan error)
+	dataArr := make([]models.Reviews, 0)
+
+	start := 0
+	for {
+		end := start + 10
+		if end > (len(snapshots) - 1) {
+			end = len(snapshots) - 1
+		}
+
+		chunkedSnapshot := snapshots[start : end+1]
+		go func() {
+			data, err := getReviewFromSnapshotSync(chunkedSnapshot)
+			if err != nil {
+				errChan <- err
+			}
+
+			dataChan <- data
+		}()
+
+		if end == len(snapshots)-1 {
+			break
+		}
+
+		start = end + 1
+	}
+
+	total := 0
+
+	for {
+		select {
+		case err := <-errChan:
+			return nil, err
+		case data := <-dataChan:
+			dataArr = append(dataArr, data...)
+			total += len(data)
+			if total == len(snapshots) {
+				fmt.Println(fmt.Sprintf("%T", dataArr))
+				return dataArr, nil
+			}
+		case <-time.After(120 * time.Second):
+			return nil, ErrorInternal.New("get data takes too long to response")
+		}
+
+	}
+}
+
+func getReviewFromSnapshotSync(snapshots []*firestore.DocumentSnapshot) ([]models.Reviews, error) {
+	dataArr := make([]models.Reviews, 0)
+	for _, snap := range snapshots {
+
+		var newReview models.Reviews
+
+		err := snap.DataTo(&newReview)
+		if err != nil {
+			return nil, ErrorInternal.New(err.Error())
+		}
+
+		dataArr = append(dataArr, newReview)
+	}
+
+	return dataArr, nil
 }

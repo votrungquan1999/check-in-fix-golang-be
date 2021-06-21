@@ -52,7 +52,7 @@ func rateReview(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"data": review,
 	})
 }
@@ -72,7 +72,7 @@ func feedbackReview(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"data": review,
 	})
 }

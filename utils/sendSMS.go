@@ -77,13 +77,18 @@ func SendSMSWithNexmo(from string, to string, text string) (interface{}, error) 
 }
 
 func SendSMSWithTwilio(from string, to string, text string) (interface{}, error) {
-	accountSid := "AC8a42c07bb553d72182d57dd5733707fa"
-	authToken := "3ac051dd261cbdd4feb1f33f27a3a9b5"
+	accountSid := setup.EnvConfig.TwilioAccountSID
+	authToken := setup.EnvConfig.TwilioAuthToken
 	urlStr := "https://api.twilio.com/2010-04-01/Accounts/" + accountSid + "/Messages.json"
+
+	if to[:1] != "+" {
+		to = "+1" + to
+	}
 
 	v := url.Values{}
 	v.Set("To", to)
-	v.Set("From", "+12062740788")
+	v.Set("MessagingServiceSid", "MG34fd5149103888d30030b780c5ad6728")
+	//v.Set("From", "Customer Feedback")
 	v.Set("Body", text)
 	rb := *strings.NewReader(v.Encode())
 

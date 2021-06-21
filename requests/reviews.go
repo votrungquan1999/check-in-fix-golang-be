@@ -1,7 +1,11 @@
 package requests
 
-type CreateReviewRequest struct {
-	CustomerID *string `json:"customer_id" binding:"required"`
+type BulkCreateReviewRequest struct {
+	Customers []*CreateSingleReviewRequest `json:"customers" binding:"required,min=1,max=50,dive"`
+}
+
+type CreateSingleReviewRequest struct {
+	CustomerID *string `json:"id" binding:"required"`
 }
 
 type RateReviewRequest struct {

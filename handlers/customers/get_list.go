@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/api/iterator"
 	"reflect"
 	"strings"
 	"time"
@@ -56,7 +55,7 @@ func GetCustomersByFilter(filter string, subscriberID string) ([]models.Customer
 	for {
 		var customer models.Customers
 		id, err := utils.GetNextDoc(iter, &customer)
-		if err == iterator.Done {
+		if id == "" {
 			break
 		}
 		if err != nil {
@@ -114,7 +113,7 @@ func GetCustomersByPhoneNumber(phoneNumber string, subscriberID string) ([]model
 	for {
 		var customer models.Customers
 		id, err := utils.GetNextDoc(iter, &customer)
-		if err == iterator.Done {
+		if id == "" {
 			break
 		}
 		if err != nil {
@@ -143,7 +142,7 @@ func GetCustomersBySubscriberID(subscriberID string) ([]models.Customers, error)
 		var customer models.Customers
 
 		id, err := utils.GetNextDoc(iter, &customer)
-		if err == iterator.Done {
+		if id == "" {
 			break
 		}
 		if err != nil {
@@ -223,7 +222,7 @@ func GetCustomerByIDsChunk(customerIDs []string) ([]models.Customers, error) {
 		var customer models.Customers
 
 		id, err := utils.GetNextDoc(iter, &customer)
-		if err == iterator.Done {
+		if id == "" {
 			break
 		}
 		if err != nil {

@@ -20,6 +20,8 @@ type Config struct {
 	FirebaseClientCertURL       string `mapstructure:"FIREBASE_CLIENT_CERT_URL"`
 	NexmoApiKey                 string
 	NexmoApiSecret              string
+	TwilioAccountSID            string
+	TwilioAuthToken             string
 }
 
 var EnvConfig Config
@@ -65,6 +67,8 @@ func LoadConfig() {
 		FirebaseClientCertURL:       mustString("FIREBASE_CLIENT_X509_CERT_URL"),
 		NexmoApiKey:                 stringDefault("NEXMO_API_KEY", ""),
 		NexmoApiSecret:              stringDefault("NEXMO_API_SECRETE", ""),
+		TwilioAccountSID:            mustString("TWILIO_ACCOUNT_SID"),
+		TwilioAuthToken:             mustString("TWILIO_AUTH_TOKEN"),
 	}
 }
 

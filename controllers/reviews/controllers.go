@@ -13,7 +13,8 @@ func RoutesGroup(rg *gin.RouterGroup) {
 	{
 		//reviewRouter.POST("")
 		//reviewRouter.GET("/:review_id", getReview)
-		reviewRouter.POST("", createReviewForCustomer)
+		reviewRouter.POST("", bulkCreateReviewForCustomer)
+		reviewRouter.GET("", utils.WithPagination(), getReviewList)
 	}
 
 	//customerReviewRouter := rg.Group("/customers/:customer_id/reviews")
@@ -21,24 +22,39 @@ func RoutesGroup(rg *gin.RouterGroup) {
 	//}
 }
 
+func bulkCreateReviewForCustomer(c *gin.Context) {
+	var bulkCreateReviewPayload requests.BulkCreateReviewRequest
 
-
-func createReviewForCustomer(c *gin.Context) {
-	var createReviewPayload requests.CreateReviewRequest
-
-	if err := c.ShouldBindJSON(&createReviewPayload); err != nil {
+	if err := c.ShouldBindJSON(&bulkCreateReviewPayload); err != nil {
 		_ = c.Error(utils.ErrorBadRequest.New(err.Error()))
 		return
 	}
 
-	review, err := reviews.CreateReview(createReviewPayload)
+	createdReviews, err := reviews.BulkCreateReview(bulkCreateReviewPayload)
 	if err != nil {
 		_ = c.Error(err)
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"data": review,
+		"data": createdReviews,
 	})
+}
 
+func getReviewList(c *gin.Context) {
+	subscriberID := c.Query("subscriber_id")
+	if subscriberID == "" {
+		_ = c.Error(utils.ErrorBadRequest.New("missing subscriber_id query param"))
+		return
+	}
+
+	reviewList, err := reviews.GetReviewList(subscriberID, c.GetInt("current_page"), c.GetInt("limit"))
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": reviewList,
+	})
 }

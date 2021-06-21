@@ -7,9 +7,45 @@ import (
 	"checkinfix.com/setup"
 	"checkinfix.com/utils"
 	"context"
+	"time"
 )
 
-func CreateReview(payload requests.CreateReviewRequest) (*models.Reviews, error) {
+func BulkCreateReview(payload requests.BulkCreateReviewRequest) ([]*models.Reviews, error) {
+	reviewChan := make(chan *models.Reviews)
+	errorChan := make(chan error)
+
+	for _, singleCustomer := range payload.Customers {
+		item := singleCustomer
+		go func() {
+			createdReview, err := CreateReview(item)
+			if err != nil {
+				errorChan <- err
+			}
+
+			reviewChan <- createdReview
+		}()
+	}
+
+	reviews := make([]*models.Reviews, 0)
+	total := 0
+
+	for {
+		select {
+		case err := <-errorChan:
+			return nil, err
+		case returnReview := <-reviewChan:
+			reviews = append(reviews, returnReview)
+			total += 1
+			if total == len(payload.Customers) {
+				return reviews, nil
+			}
+		case <-time.After(120 * time.Second):
+			return nil, utils.ErrorInternal.New("request takes too long to create reviews")
+		}
+	}
+}
+
+func CreateReview(payload *requests.CreateSingleReviewRequest) (*models.Reviews, error) {
 	firestoreClient := setup.FirestoreClient
 	ctx := context.Background()
 
@@ -27,6 +63,8 @@ func CreateReview(payload requests.CreateReviewRequest) (*models.Reviews, error)
 		ID:           &newRef.ID,
 		CustomerID:   payload.CustomerID,
 		SubscriberID: customer.SubscriberID,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
 	_, err = newRef.Set(ctx, newReview)

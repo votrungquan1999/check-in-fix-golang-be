@@ -7,6 +7,7 @@ import (
 	"checkinfix.com/setup"
 	"checkinfix.com/utils"
 	"context"
+	"fmt"
 )
 
 func SendSMSToCustomers(payload requests.SMSSendingRequest) error {
@@ -43,7 +44,8 @@ func SendSMSToCustomers(payload requests.SMSSendingRequest) error {
 	}
 
 	for _, customer := range customers {
-		_, err := utils.SendSMSWithTwilio("", *customer.PhoneNumber, *payload.Message)
+		resp, err := utils.SendSMSWithTwilio("", *customer.PhoneNumber, *payload.Message)
+		fmt.Println(resp)
 		if err != nil {
 			return err
 		}

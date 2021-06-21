@@ -10,7 +10,6 @@ import (
 	"context"
 	"firebase.google.com/go/v4/auth"
 	"fmt"
-	"google.golang.org/api/iterator"
 )
 
 func CreateEmployee(subscriberID string, payload requests.CreateEmployeeRequest) (*models.Employees, error) {
@@ -51,7 +50,7 @@ func CreateEmployee(subscriberID string, payload requests.CreateEmployeeRequest)
 		*payload.Email).Documents(ctx)
 	var createEmployee models.Employees
 	id, err := utils.GetNextDoc(iter, &createEmployee)
-	if err == iterator.Done {
+	if id == "" {
 		return nil, utils.ErrorInternal.New("data is not inserted for some reason")
 	}
 	if err != nil {
