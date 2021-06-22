@@ -34,10 +34,10 @@ func SendSMSToCustomers(payload requests.SMSSendingRequest) error {
 		customer.ID = &id
 		if subscriberID == nil {
 			subscriberID = customer.SubscriberID
-		} else {
-			if subscriberID != customer.SubscriberID {
-				return utils.ErrorBadRequest.New("all customers are not from the same subscriber")
-			}
+		}
+
+		if *subscriberID != *customer.SubscriberID {
+			return utils.ErrorBadRequest.New("all customers are not from the same subscriber")
 		}
 
 		customers = append(customers, customer)
