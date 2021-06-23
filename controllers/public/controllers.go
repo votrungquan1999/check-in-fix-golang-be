@@ -2,6 +2,7 @@ package public
 
 import (
 	"checkinfix.com/handlers/reviews"
+	"checkinfix.com/handlers/settings"
 	"checkinfix.com/requests"
 	"checkinfix.com/utils"
 	"github.com/gin-gonic/gin"
@@ -14,13 +15,8 @@ func RoutesGroup(rg *gin.RouterGroup) {
 		reviewRouter.GET("/:review_id", getReview)
 		reviewRouter.POST("/:review_id/ratings", rateReview)
 		reviewRouter.POST("/:review_id/feedbacks", feedbackReview)
+		reviewRouter.GET("/:review_id/rating-platforms", getRatingPlatform)
 	}
-
-	//userRouter := rg.Group("/customers")
-	//{
-	//	userRouter.GET("/:phone_number", public.GetCustomers)
-	//	userRouter.POST("/", public.CreateCustomer)
-	//}
 }
 
 func getReview(c *gin.Context) {
@@ -74,5 +70,19 @@ func feedbackReview(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"data": review,
+	})
+}
+
+func getRatingPlatform(c *gin.Context) {
+	reviewID := c.Param("review_id")
+
+	ratingPlatforms, err := settings.GetRatingPlatformByReviewID(reviewID)
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": ratingPlatforms,
 	})
 }

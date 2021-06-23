@@ -88,8 +88,6 @@ func updateCustomer(c *gin.Context) {
 		return
 	}
 
-	//fmt.Println(updateCustomerPayload.PhoneNumber, customerID, updateCustomerPayload.PhoneNumber == nil)
-
 	updatedCustomer, err := customerHandler.UpdateCustomer(customerID, updateCustomerPayload)
 	if err != nil {
 		_ = c.Error(err)
