@@ -29,4 +29,12 @@ type (
 		Country            *string `json:"country"`
 		SubscriberID       *string `json:"subscriber_id"`
 	}
+
+	SingleDeleteCustomerRequest struct {
+		ID *string `json:"id" binding:"required"`
+	}
+
+	BulkDeleteCustomersRequest struct {
+		Customers []SingleDeleteCustomerRequest `json:"customers" binding:"required,min=1,max=50,dive"`
+	}
 )

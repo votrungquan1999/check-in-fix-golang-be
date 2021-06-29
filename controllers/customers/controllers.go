@@ -14,7 +14,15 @@ func RoutesGroup(rg *gin.RouterGroup) {
 	{
 		customerRouter.POST("", createCustomer)
 		customerRouter.GET("", getCustomersHandler)
+		customerRouter.GET("/:customer_id", getCustomerDetailByID)
 		customerRouter.PATCH("/:customer_id", updateCustomer)
+	}
+}
+
+func AdminRoutesGroup(rg *gin.RouterGroup) {
+	customerRouter := rg.Group("/customers")
+	{
+		customerRouter.DELETE("", bulkDeleteCustomer)
 	}
 }
 
@@ -96,5 +104,37 @@ func updateCustomer(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": updatedCustomer,
+	})
+}
+
+func bulkDeleteCustomer(c *gin.Context) {
+	var bulkDeleteCustomerPayload requests.BulkDeleteCustomersRequest
+	if err := c.ShouldBindJSON(&bulkDeleteCustomerPayload); err != nil {
+		_ = c.Error(utils.ErrorBadRequest.New(err.Error()))
+		return
+	}
+
+	deletedCustomer, err := customerHandler.BulkDeleteCustomers(bulkDeleteCustomerPayload)
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": deletedCustomer,
+	})
+}
+
+func getCustomerDetailByID(c *gin.Context) {
+	customerID := c.Param("customer_id")
+
+	customer, err := customerHandler.GetCustomerDetailByID(customerID)
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": customer,
 	})
 }

@@ -8,6 +8,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"reflect"
 	"strings"
 	"time"
@@ -237,4 +239,26 @@ func GetCustomerByIDsChunk(customerIDs []string) ([]models.Customers, error) {
 	fmt.Println(customers)
 
 	return customers, nil
+}
+
+func GetCustomerDetailByID(customerID string) (*models.Customers, error) {
+	firestoreClient := setup.FirestoreClient
+	ctx := context.Background()
+
+	customerRef := firestoreClient.Collection(constants.FirestoreCustomerDoc).Doc(customerID)
+
+	customerSnapshot, err := customerRef.Get(ctx)
+	if status.Code(err) == codes.NotFound {
+		return nil, utils.ErrorEntityNotFound.New("customer id not found")
+	}
+	if err != nil {
+		return nil, utils.ErrorInternal.New(err.Error())
+	}
+
+	var customer models.Customers
+	if err = customerSnapshot.DataTo(&customer); err != nil {
+		return nil, utils.ErrorInternal.New(err.Error())
+	}
+
+	return &customer, nil
 }

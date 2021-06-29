@@ -36,4 +36,9 @@ func SetupRoutes(r *gin.Engine) {
 		sms_sending.RoutesGroup(privateRoutesGroup)
 		reviews.RoutesGroup(privateRoutesGroup)
 	}
+
+	adminRequiredRoutesGroup := r.Group("/private", middlewares.FirebaseAuth("ADMIN", "ALL_ACCESS"))
+	{
+		customers.AdminRoutesGroup(adminRequiredRoutesGroup)
+	}
 }

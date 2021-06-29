@@ -7,5 +7,5 @@ type Employees struct {
 	FirstName    *string  `firestore:"first_name,omitempty" json:"first_name" binding:"omitempty"`
 	LastName     *string  `firestore:"last_name,omitempty" json:"last_name" binding:"omitempty"`
 	SubscriberID *string  `firestore:"subscriber_id,omitempty" json:"subscriber_id" binding:"omitempty"`
-	Scopes       []string `firestore:"scope,omitempty" json:"scopes" binding:"omitempty"`
+	Scopes       []string `firestore:"scopes,omitempty" json:"scopes" binding:"omitempty"`
 }

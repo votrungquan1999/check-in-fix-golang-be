@@ -8,12 +8,16 @@ const (
 	ErrorInternal CommonErrors = iota
 	ErrorBadRequest
 	ErrorEntityNotFound
+	ErrorUnauthorized
+	ErrorForbidden
 )
 
 var mapErrorHTTPCode = map[CommonErrors]int{
 	ErrorInternal:       http.StatusInternalServerError,
 	ErrorBadRequest:     http.StatusBadRequest,
 	ErrorEntityNotFound: http.StatusNotFound,
+	ErrorUnauthorized:   http.StatusUnauthorized,
+	ErrorForbidden:      http.StatusForbidden,
 }
 
 func (c CommonErrors) New(message string) error {

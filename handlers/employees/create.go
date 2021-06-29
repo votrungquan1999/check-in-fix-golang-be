@@ -10,6 +10,7 @@ import (
 	"context"
 	"firebase.google.com/go/v4/auth"
 	"fmt"
+	"strings"
 )
 
 func CreateEmployee(subscriberID string, payload requests.CreateEmployeeRequest) (*models.Employees, error) {
@@ -25,13 +26,20 @@ func CreateEmployee(subscriberID string, payload requests.CreateEmployeeRequest)
 
 		ref := firestoreClient.Collection(constants.FirestoreEmployeeDoc).NewDoc()
 
+		var upperCaseScopes []string
+		if payload.Scopes != nil {
+			for _, scope := range payload.Scopes {
+				upperCaseScopes = append(upperCaseScopes, strings.ToUpper(scope))
+			}
+		}
+
 		newEmployee := models.Employees{
 			UserID:       &user.UID,
 			Email:        payload.Email,
 			FirstName:    payload.FirstName,
 			LastName:     payload.LastName,
 			SubscriberID: &subscriberID,
-			Scopes:       payload.Scopes,
+			Scopes:       upperCaseScopes,
 			ID:           &ref.ID,
 		}
 

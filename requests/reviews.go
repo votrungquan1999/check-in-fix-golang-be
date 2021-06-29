@@ -1,7 +1,7 @@
 package requests
 
 type BulkCreateReviewRequest struct {
-	Customers []*CreateSingleReviewRequest `json:"customers" binding:"required,min=1,max=50,dive"`
+	Customers []CreateSingleReviewRequest `json:"customers" binding:"required,min=1,max=50,dive"`
 }
 
 type CreateSingleReviewRequest struct {
