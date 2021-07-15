@@ -47,3 +47,28 @@ func GetRatingPlatformByReviewID(reviewID string) ([]models.RatingPlatform, erro
 
 	return ratingPlatforms, nil
 }
+
+func GetRatingPlatformBySubscriberID(subscriberID string) ([]models.RatingPlatform, error) {
+	firestoreClient := setup.FirestoreClient
+	ctx := context.Background()
+
+	ratingPlatformIter := firestoreClient.Collection(constants.FirestoreRatingPlatformDoc).Where("subscriber_id",
+		"==", subscriberID).Documents(ctx)
+
+	ratingPlatforms := make([]models.RatingPlatform, 0)
+	for {
+		var ratingPlatform models.RatingPlatform
+
+		id, err := utils.GetNextDoc(ratingPlatformIter, &ratingPlatform)
+		if id == "" {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		ratingPlatforms = append(ratingPlatforms, ratingPlatform)
+	}
+
+	return ratingPlatforms, nil
+}

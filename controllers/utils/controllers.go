@@ -2,7 +2,9 @@ package utils
 
 import (
 	"checkinfix.com/constants"
+	"checkinfix.com/handlers/subscribers"
 	"checkinfix.com/models"
+	"checkinfix.com/requests"
 	"checkinfix.com/setup"
 	"checkinfix.com/utils"
 	"context"
@@ -15,7 +17,11 @@ func RoutesGroup(rg *gin.RouterGroup) {
 	authRouter := rg.Group("/auth")
 	{
 		authRouter.GET("/employee-info", getEmployInfo)
+	}
 
+	utilsRouter := rg.Group("/utils")
+	{
+		utilsRouter.POST("/default-ticket-status", createDefaultTicketStatus)
 	}
 }
 
@@ -45,4 +51,19 @@ func getEmployInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"data": employee,
 	})
+}
+
+func createDefaultTicketStatus(c *gin.Context) {
+	var createDefaultTicketPayload requests.CreateDefaultTickets
+	if err := c.ShouldBindJSON(&createDefaultTicketPayload); err != nil {
+		_ = c.Error(utils.ErrorBadRequest.New(err.Error()))
+		return
+	}
+
+	if err := subscribers.CreateDefaultTicketStatuses(createDefaultTicketPayload.SubscriberID); err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	c.AbortWithStatus(204)
 }

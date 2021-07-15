@@ -1,17 +1,19 @@
 package controllers
 
 import (
+	"net/http"
+
 	"checkinfix.com/controllers/customers"
 	"checkinfix.com/controllers/employees"
 	"checkinfix.com/controllers/public"
 	"checkinfix.com/controllers/reviews"
+	"checkinfix.com/controllers/settings"
 	"checkinfix.com/controllers/sms_sending"
 	"checkinfix.com/controllers/subscribers"
 	"checkinfix.com/controllers/tickets"
 	"checkinfix.com/controllers/utils"
 	"checkinfix.com/middlewares"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func SetupRoutes(r *gin.Engine) {
@@ -35,6 +37,7 @@ func SetupRoutes(r *gin.Engine) {
 		tickets.RoutesGroup(privateRoutesGroup)
 		sms_sending.RoutesGroup(privateRoutesGroup)
 		reviews.RoutesGroup(privateRoutesGroup)
+		settings.RoutesGroup(privateRoutesGroup)
 	}
 
 	adminRequiredRoutesGroup := r.Group("/private", middlewares.FirebaseAuth("ADMIN", "ALL_ACCESS"))

@@ -6,15 +6,23 @@ import (
 	"checkinfix.com/setup"
 	"checkinfix.com/utils"
 	"context"
-	"github.com/gin-gonic/gin"
 )
 
-func GetListTicketsBySubscriberID(subscriberID string, c *gin.Context) ([]models.Tickets, error) {
-	tickets, err := GetDraftTickets(subscriberID)
-	return tickets, err
+func GetListTicket(subscriberID string, customerID string) ([]*models.Tickets, error) {
+	if subscriberID != "" {
+		tickets, err := getListTicketsBySubscriberID(subscriberID)
+		return tickets, err
+	}
+
+	if customerID != "" {
+		tickets, err := getTicketsByCustomerID(customerID)
+		return tickets, err
+	}
+
+	return nil, utils.ErrorBadRequest.New("tickets need to be filtered")
 }
 
-func GetDraftTickets(subscriberID string) ([]models.Tickets, error) {
+func getListTicketsBySubscriberID(subscriberID string) ([]*models.Tickets, error) {
 	firestoreClient := setup.FirestoreClient
 	ctx := context.Background()
 
@@ -23,7 +31,7 @@ func GetDraftTickets(subscriberID string) ([]models.Tickets, error) {
 		Where("approved_by", "==", "").
 		Documents(ctx)
 
-	draftTickets := make([]models.Tickets, 0)
+	draftTickets := make([]*models.Tickets, 0)
 	for {
 		var ticket models.Tickets
 		id, err := utils.GetNextDoc(ticketIter, &ticket)
@@ -36,13 +44,13 @@ func GetDraftTickets(subscriberID string) ([]models.Tickets, error) {
 
 		ticket.ID = &id
 
-		draftTickets = append(draftTickets, ticket)
+		draftTickets = append(draftTickets, &ticket)
 	}
 
 	return draftTickets, nil
 }
 
-func GetTicketsByCustomerID(customerID string) ([]models.Tickets, error) {
+func getTicketsByCustomerID(customerID string) ([]*models.Tickets, error) {
 	firestoreClient := setup.FirestoreClient
 	ctx := context.Background()
 
@@ -50,7 +58,7 @@ func GetTicketsByCustomerID(customerID string) ([]models.Tickets, error) {
 		Where("customer_id", "==", customerID).
 		Documents(ctx)
 
-	tickets := make([]models.Tickets, 0)
+	tickets := make([]*models.Tickets, 0)
 	for {
 		var ticket models.Tickets
 		id, err := utils.GetNextDoc(ticketIter, &ticket)
@@ -63,7 +71,7 @@ func GetTicketsByCustomerID(customerID string) ([]models.Tickets, error) {
 
 		ticket.ID = &id
 
-		tickets = append(tickets, ticket)
+		tickets = append(tickets, &ticket)
 	}
 
 	return tickets, nil

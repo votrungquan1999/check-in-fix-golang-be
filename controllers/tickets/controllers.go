@@ -2,7 +2,6 @@ package tickets
 
 import (
 	ticketHandler "checkinfix.com/handlers/tickets"
-	"checkinfix.com/models"
 	"checkinfix.com/requests"
 	"checkinfix.com/utils"
 	"github.com/gin-gonic/gin"
@@ -49,31 +48,15 @@ func createTicket(c *gin.Context) {
 }
 
 func getTickets(c *gin.Context) {
-	//subscriberID := c.Param("subscriber_id")
+	subscriberID := c.Query("subscriber_id")
+	customerID := c.Query("customer_id")
 
-	var tickets []models.Tickets
-	var err error
-
-	query := c.Request.URL.Query()
-
-	subscriberIDs := query["subscriber_id"]
-	if len(subscriberIDs) > 0 {
-		tickets, err = ticketHandler.GetListTicketsBySubscriberID(subscriberIDs[0], c)
-	}
-
-	customerIDs := query["customer_id"]
-	if len(customerIDs) > 0 {
-		tickets, err = ticketHandler.GetTicketsByCustomerID(customerIDs[0])
-	}
-
-	if tickets == nil && err == nil{
-		err = utils.ErrorBadRequest.New("tickets need to be filtered")
-	}
-
+	tickets, err := ticketHandler.GetListTicket(subscriberID, customerID)
 	if err != nil {
 		_ = c.Error(err)
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"data": tickets,
 	})
