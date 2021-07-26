@@ -76,6 +76,7 @@ func prepareNewTicket(id string, payload requests.CreateTicketRequest, customer 
 		CustomerID:            payload.CustomerID,
 		SubscriberID:          customer.SubscriberID,
 		ServiceID:             serviceID,
+		Service:               payload.Service,
 		IMEI:                  payload.IMEI,
 		DeviceModel:           payload.DeviceModel,
 		Description:           payload.Description,

@@ -7,6 +7,7 @@ type Tickets struct {
 	CustomerID            *string  `firestore:"customer_id,omitempty" json:"customer_id"`
 	SubscriberID          *string  `firestore:"subscriber_id,omitempty" json:"subscriber_id"`
 	ServiceID             *string  `firestore:"service_id,omitempty" json:"service_id"`
+	Service               *string  `firestore:"service,omitempty" json:"service"`
 	IMEI                  *string  `firestore:"imei" json:"imei"`
 	DeviceModel           *string  `firestore:"device_model,omitempty" json:"device_model"`
 	Description           *string  `firestore:"description,omitempty" json:"description"`

@@ -3,6 +3,7 @@ package requests
 type CreateTicketRequest struct {
 	CustomerID            *string  `json:"customer_id" binding:"required"`
 	ServiceID             *string  `json:"service_id"`
+	Service               *string  `json:"service"`
 	Description           *string  `json:"description"`
 	DeviceModel           *string  `json:"device_model"`
 	ContactPhoneNumber    *string  `json:"contact_phone_number"`

@@ -29,6 +29,7 @@ func GetCustomersWithSubscriberID(c *gin.Context, subscriberID string) ([]models
 	}
 
 	filter := c.Query("filter")
+	//println(filter)
 	if filter != "" {
 		customers, err = GetCustomersByFilter(strings.ToLower(filter), subscriberID)
 		if err != nil {
@@ -79,6 +80,7 @@ func CustomerContains(customer models.Customers, key string) bool {
 	v := reflect.ValueOf(customer)
 
 	values := make([]string, 0)
+	values = append(values, strings.ToLower(*customer.FirstName + " " + *customer.LastName))
 
 	for i := 0; i < v.NumField(); i++ {
 		value, ok := (v.Field(i).Interface()).(*string)
