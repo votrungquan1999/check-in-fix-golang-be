@@ -13,6 +13,9 @@ type Tickets struct {
 	Description           *string  `firestore:"description,omitempty" json:"description"`
 	ContactPhoneNumber    *string  `firestore:"contact_phone_number,omitempty" json:"contact_phone_number"`
 	SMSNotificationEnable *bool    `firestore:"sms_notification_enable,omitempty" json:"sms_notification_enable"`
+	IsDevicePowerOn       *bool    `firestore:"is_device_power_on,omitempty" json:"is_device_power_on"`
+	DroppedOffAt          *string  `firestore:"dropped_off_at,omitempty" json:"dropped_off_at"`
+	PickUpAt              *string  `firestore:"pick_up_at" json:"pick_up_at"`
 	Status                *int64   `firestore:"status" json:"status"`
 	PaymentStatus         *int64   `firestore:"payment_status" json:"payment_status"`
 	Quote                 *float64 `firestore:"quote" json:"quote"`

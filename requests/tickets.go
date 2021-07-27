@@ -8,6 +8,9 @@ type CreateTicketRequest struct {
 	DeviceModel           *string  `json:"device_model"`
 	ContactPhoneNumber    *string  `json:"contact_phone_number"`
 	SMSNotificationEnable bool     `json:"sms_notification_enable"`
+	IsDevicePowerOn       bool     `json:"is_device_power_on"`
+	DroppedOffAt          *string  `json:"dropped_off_at"`
+	PickUpAt              *string  `json:"pick_up_at"`
 	IMEI                  *string  `json:"imei"`
 	Quote                 *float64 `json:"quote"`
 	Paid                  *float64 `json:"paid"`
