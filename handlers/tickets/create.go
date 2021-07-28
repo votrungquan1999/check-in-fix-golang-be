@@ -71,28 +71,40 @@ func prepareNewTicket(id string, payload requests.CreateTicketRequest, customer 
 		serviceID = utils.StringPointer(constants.ServiceDefault)
 	}
 
+	devices := make([]models.TicketDevice, 0)
+	for _, deviceInput := range payload.Devices {
+		devices = append(devices, models.TicketDevice{
+			IMEI:            deviceInput.IMEI,
+			DeviceModel:     deviceInput.DeviceModel,
+			Service:         deviceInput.Service,
+			IsDevicePowerOn: &deviceInput.IsDevicePowerOn,
+		})
+	}
+
 	return models.Tickets{
-		ID:                    &id,
-		CustomerID:            payload.CustomerID,
-		SubscriberID:          customer.SubscriberID,
-		ServiceID:             serviceID,
-		Service:               payload.Service,
-		IMEI:                  payload.IMEI,
-		DeviceModel:           payload.DeviceModel,
+		ID:           &id,
+		CustomerID:   payload.CustomerID,
+		SubscriberID: customer.SubscriberID,
+		ServiceID:    serviceID,
+		//Service:               payload.Service,
+		//IMEI:                  payload.IMEI,
+		//DeviceModel:           payload.DeviceModel,
 		Description:           payload.Description,
 		ContactPhoneNumber:    payload.ContactPhoneNumber,
 		SMSNotificationEnable: &payload.SMSNotificationEnable,
-		IsDevicePowerOn:       &payload.IsDevicePowerOn,
-		DroppedOffAt:          payload.DroppedOffAt,
-		PickUpAt:              payload.PickUpAt,
-		Status:                firstStatus.Order,
-		PaymentStatus:         utils.Int64Pointer(constants.TicketUnpaid),
-		Quote:                 payload.Quote,
-		Paid:                  payload.Paid,
-		CreatedAt:             time.Now(),
-		UpdatedAt:             time.Now(),
-		ApprovedBy:            &approvedBy,
-		TechnicianNotes:       nil,
-		Problem:               nil,
+		//IsDevicePowerOn:       &payload.IsDevicePowerOn,
+		DroppedOffAt:    payload.DroppedOffAt,
+		PickUpAt:        payload.PickUpAt,
+		Status:          firstStatus.Order,
+		PaymentStatus:   utils.Int64Pointer(constants.TicketUnpaid),
+		Quote:           payload.Quote,
+		Paid:            payload.Paid,
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
+		ApprovedBy:      &approvedBy,
+		TechnicianNotes: nil,
+		Problem:         nil,
+
+		Devices: devices,
 	}
 }
