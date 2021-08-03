@@ -24,7 +24,8 @@ func RoutesGroup(rg *gin.RouterGroup) {
 		ticketRouter.POST("", createTicket)
 		ticketRouter.GET("/:ticket_id/approval", approveTicket)
 
-		ticketRouter.GET("", getTickets)
+		ticketRouter.GET("", getTicketList)
+		ticketRouter.GET("/:ticket_id", getTicketDetail)
 	}
 }
 
@@ -47,7 +48,7 @@ func createTicket(c *gin.Context) {
 	})
 }
 
-func getTickets(c *gin.Context) {
+func getTicketList(c *gin.Context) {
 	subscriberID := c.Query("subscriber_id")
 	customerID := c.Query("customer_id")
 
@@ -66,6 +67,20 @@ func approveTicket(c *gin.Context) {
 	ticketID := c.Param("ticket_id")
 
 	ticket, err := ticketHandler.ApproveTicket(ticketID)
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": ticket,
+	})
+}
+
+func getTicketDetail(c *gin.Context) {
+	ticketID := c.Param("ticket_id")
+
+	ticket, err := ticketHandler.GetTicketDetail(ticketID)
 	if err != nil {
 		_ = c.Error(err)
 		return

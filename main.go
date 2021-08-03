@@ -4,6 +4,7 @@ import (
 	"checkinfix.com/controllers"
 	"checkinfix.com/middlewares"
 	"checkinfix.com/setup"
+	"checkinfix.com/workers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,4 +36,6 @@ func main() {
 	setup.StartFirebase()
 
 	_ = r.Run()
+
+	workers.StartAllWorkers()
 }

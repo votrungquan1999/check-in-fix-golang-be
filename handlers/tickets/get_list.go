@@ -6,6 +6,7 @@ import (
 	"checkinfix.com/setup"
 	"checkinfix.com/utils"
 	"context"
+	"time"
 )
 
 func GetListTicket(subscriberID string, customerID string) ([]*models.Tickets, error) {
@@ -31,7 +32,7 @@ func getListTicketsBySubscriberID(subscriberID string) ([]*models.Tickets, error
 		Where("approved_by", "==", "").
 		Documents(ctx)
 
-	draftTickets := make([]*models.Tickets, 0)
+	tickets := make([]*models.Tickets, 0)
 	for {
 		var ticket models.Tickets
 		id, err := utils.GetNextDoc(ticketIter, &ticket)
@@ -44,10 +45,10 @@ func getListTicketsBySubscriberID(subscriberID string) ([]*models.Tickets, error
 
 		ticket.ID = &id
 
-		draftTickets = append(draftTickets, &ticket)
+		tickets = append(tickets, &ticket)
 	}
 
-	return draftTickets, nil
+	return tickets, nil
 }
 
 func getTicketsByCustomerID(customerID string) ([]*models.Tickets, error) {
@@ -56,6 +57,7 @@ func getTicketsByCustomerID(customerID string) ([]*models.Tickets, error) {
 
 	ticketIter := firestoreClient.Collection(constants.FirestoreTicketDoc).
 		Where("customer_id", "==", customerID).
+		Where("to_be_removed_at", "!=", time.Now()).
 		Documents(ctx)
 
 	tickets := make([]*models.Tickets, 0)

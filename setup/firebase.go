@@ -6,12 +6,14 @@ import (
 	"encoding/json"
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
+	"firebase.google.com/go/v4/storage"
 	"google.golang.org/api/option"
 	"log"
 )
 
 var AuthClient *auth.Client
 var FirestoreClient *firestore.Client
+var StorageClient *storage.Client
 
 func StartFirebase() {
 	config := GetFirebaseConfig()
@@ -37,6 +39,11 @@ func StartFirebase() {
 	FirestoreClient, err = app.Firestore(ctx)
 	if err != nil {
 		log.Fatalf("error initializing firestore client: %v\n", err)
+	}
+
+	StorageClient, err = app.Storage(ctx)
+	if err != nil {
+		log.Fatalf("error initializing storage client: %v\n", err)
 	}
 
 	//var err error
