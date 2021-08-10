@@ -66,10 +66,10 @@ func prepareNewTicket(id string, payload requests.CreateTicketRequest, customer 
 	firstStatus *models.TicketStatuses) models.Tickets {
 	var approvedBy = ""
 
-	serviceID := payload.ServiceID
-	if payload.ServiceID == nil {
-		serviceID = utils.StringPointer(constants.ServiceDefault)
-	}
+	//serviceID := payload.ServiceID
+	//if payload.ServiceID == nil {
+	//	serviceID = utils.StringPointer(constants.ServiceDefault)
+	//}
 
 	devices := make([]models.TicketDevice, 0)
 	for _, deviceInput := range payload.Devices {
@@ -82,10 +82,10 @@ func prepareNewTicket(id string, payload requests.CreateTicketRequest, customer 
 	}
 
 	return models.Tickets{
-		ID:                    &id,
-		CustomerID:            payload.CustomerID,
-		SubscriberID:          customer.SubscriberID,
-		ServiceID:             serviceID,
+		ID:           &id,
+		CustomerID:   payload.CustomerID,
+		SubscriberID: customer.SubscriberID,
+		//ServiceID:             serviceID,
 		Description:           payload.Description,
 		ContactPhoneNumber:    payload.ContactPhoneNumber,
 		SMSNotificationEnable: &payload.SMSNotificationEnable,

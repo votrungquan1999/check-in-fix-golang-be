@@ -9,16 +9,6 @@ import (
 )
 
 func RoutesGroup(rg *gin.RouterGroup) {
-	//ticketRouter := rg.Group("/tickets")
-	//{
-	//	ticketRouter.POST("/", public.CreateTicket)
-	//}
-
-	//getTicketRouter := rg.Group("/subscribers/:subscriber_id")
-	//{
-	//
-	//}
-
 	ticketRouter := rg.Group("/tickets")
 	{
 		ticketRouter.POST("", createTicket)
@@ -26,6 +16,8 @@ func RoutesGroup(rg *gin.RouterGroup) {
 
 		ticketRouter.GET("", getTicketList)
 		ticketRouter.GET("/:ticket_id", getTicketDetail)
+		ticketRouter.PATCH("/:ticket_id", updateTicket)
+		ticketRouter.DELETE("/:ticket_id", deleteTicket)
 	}
 }
 
@@ -84,6 +76,38 @@ func getTicketDetail(c *gin.Context) {
 	if err != nil {
 		_ = c.Error(err)
 		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": ticket,
+	})
+}
+
+func updateTicket(c *gin.Context) {
+	ticketID := c.Param("ticket_id")
+
+	var updateRequest requests.UpdateTicketRequest
+	if err := c.ShouldBindJSON(&updateRequest); err != nil {
+		_ = c.Error(utils.ErrorBadRequest.New(err.Error()))
+		return
+	}
+
+	ticket, err := ticketHandler.Update(updateRequest, ticketID)
+	if err != nil {
+		_ = c.Error(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": ticket,
+	})
+}
+
+func deleteTicket(c *gin.Context) {
+	ticketID := c.Param("ticket_id")
+
+	ticket, err := ticketHandler.Delete(ticketID)
+	if err != nil {
+		_ = c.Error(err)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
