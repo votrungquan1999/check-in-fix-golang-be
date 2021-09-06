@@ -114,14 +114,14 @@ func bulkDeleteCustomer(c *gin.Context) {
 		return
 	}
 
-	deletedCustomer, err := customerHandler.BulkDeleteCustomers(bulkDeleteCustomerPayload)
+	deletedCustomers, err := customerHandler.BulkDeleteCustomers(bulkDeleteCustomerPayload)
 	if err != nil {
 		_ = c.Error(err)
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": deletedCustomer,
+		"data": deletedCustomers,
 	})
 }
 

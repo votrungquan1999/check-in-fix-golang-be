@@ -13,7 +13,6 @@ func RoutesGroup(rg *gin.RouterGroup) {
 	{
 		ticketRouter.POST("", createTicket)
 		ticketRouter.GET("/:ticket_id/approval", approveTicket)
-
 		ticketRouter.GET("", getTicketList)
 		ticketRouter.GET("/:ticket_id", getTicketDetail)
 		ticketRouter.PATCH("/:ticket_id", updateTicket)

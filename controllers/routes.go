@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"checkinfix.com/controllers/inventories"
+	"checkinfix.com/controllers/purchases"
 	"net/http"
 
 	"checkinfix.com/controllers/customers"
@@ -38,6 +40,8 @@ func SetupRoutes(r *gin.Engine) {
 		sms_sending.RoutesGroup(privateRoutesGroup)
 		reviews.RoutesGroup(privateRoutesGroup)
 		settings.RoutesGroup(privateRoutesGroup)
+		inventories.RoutesGroup(privateRoutesGroup)
+		purchases.RoutesGroup(privateRoutesGroup)
 	}
 
 	adminRequiredRoutesGroup := r.Group("/private", middlewares.FirebaseAuth("ADMIN", "ALL_ACCESS"))
